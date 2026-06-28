@@ -19,9 +19,9 @@ $endpoint = substr($uri, strlen($basePath));
 $endpoint = preg_replace('#^/api_proxy\.php#', '', $endpoint);
 $cleanPath = parse_url($endpoint, PHP_URL_PATH);
 
-$isPublicPatientRoute = preg_match('#^/pasien/([^/]+)/monitoring#', $cleanPath);
+$isPublicReadRoute = preg_match('#^/titik-risiko#', $cleanPath) && $_SERVER['REQUEST_METHOD'] === 'GET';
 
-if ($cleanPath !== '/login' && $cleanPath !== '/register' && !$isPublicPatientRoute) {
+if ($cleanPath !== '/login' && $cleanPath !== '/register' && !$isPublicReadRoute) {
     if (!isset($_SESSION['api_token']) && !isset($_SESSION['user'])) {
         http_response_code(401);
         echo json_encode([
