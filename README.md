@@ -50,7 +50,7 @@ Aplikasi menggunakan arsitektur **decoupled**:
 1. **Backend Laravel** — Melayani dua antarmuka sekaligus:
    - **Blade Views** — Dashboard admin dan petugas (server-side rendering)
    - **JSON REST API** — Dikonsumsi oleh public portal frontend (PHP native)
-2. **Public Portal** — Berada di `public/frontend/`, merupakan halaman PHP native yang mengambil data dari `localhost:8000/api` menggunakan JavaScript `fetch()` dan cURL.
+2. **Public Portal** — Berada di `frontend-moskout/`, merupakan halaman PHP native yang mengambil data dari backend Laravel melalui `api_proxy.php` menggunakan JavaScript `fetch()`.
 
 ---
 
@@ -241,36 +241,52 @@ Data wilayah (provinsi → kabupaten → kecamatan → kelurahan) diambil dari [
 git clone <repo-url>
 cd uaspemweb
 
-# 2. Install PHP dependencies
+# 2. Masuk ke direktori backend
+cd backend-moskout
+
+# 3. Install PHP dependencies
 composer install
 
-# 3. Copy environment
+# 4. Copy environment
 copy .env.example .env
 # atau: cp .env.example .env
 
-# 4. Generate application key
+# 5. Generate application key
 php artisan key:generate
 
-# 5. Setup database
+# 6. Setup database
 # Buat database MySQL bernama 'moskout', lalu:
 php artisan migrate --seed
 
-# 6. Install Node dependencies (opsional, untuk Vite)
+# 7. Install Node dependencies (opsional, untuk Vite)
 npm install
 
-# 7. Jalankan aplikasi
+# 8. Jalankan aplikasi
 php artisan serve
 # Aplikasi akan berjalan di http://localhost:8000
 ```
 
 ### Menjalankan Public Portal
 
-Public portal berada di `public/frontend/`. Akses melalui browser saat `php artisan serve` berjalan, misal:
-- `http://localhost:8000/frontend/index.php`
-- `http://localhost:8000/frontend/daftar-risiko.php`
-- `http://localhost:8000/frontend/detail.php?id=1`
-- `http://localhost:8000/frontend/tambah-pemeriksaan.php`
-- `http://localhost:8000/frontend/edukasi.php`
+Public portal berada di `frontend-moskout/`. Jalankan menggunakan server PHP terpisah (di samping backend Laravel):
+
+```bash
+# Dari root project, jalankan server untuk frontend
+cd frontend-moskout
+php -S localhost:8080
+```
+
+Akses melalui browser:
+- `http://localhost:8080/index.php`
+- `http://localhost:8080/daftar-risiko.php`
+- `http://localhost:8080/detail.php?id=1`
+- `http://localhost:8080/tambah-pemeriksaan.php`
+- `http://localhost:8080/edukasi.php`
+
+Atau jalankan langsung dengan PHP built-in server dari root project:
+```bash
+php -S localhost:8080 -t frontend-moskout
+```
 
 ### Akun Default
 
@@ -284,60 +300,52 @@ Public portal berada di `public/frontend/`. Akses melalui browser saat `php arti
 ## Struktur Direktori
 
 ```
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── AuthController.php
-│   │   │   ├── DashboardController.php
-│   │   │   ├── PetugasDashboardController.php
-│   │   │   ├── TitikRisikoController.php
-│   │   │   ├── PemeriksaanRisikoController.php
-│   │   │   ├── RekapController.php
-│   │   │   └── ApiWaspadaController.php
-│   │   └── Middleware/
-│   │       └── RoleMiddleware.php
-│   └── Models/
-│       ├── User.php
-│       ├── TitikRisiko.php
-│       └── PemeriksaanRisiko.php
-├── database/
-│   ├── migrations/
-│   │   ├── 0001_01_01_000000_create_users_table.php
-│   │   ├── 0001_01_01_000001_create_cache_table.php
-│   │   ├── 0001_01_01_000002_create_jobs_table.php
-│   │   ├── 2025_01_20_142124_add_role_to_users_table.php
-│   │   ├── 2025_01_20_142510_create_titik_risikos_table.php
-│   │   ├── 2025_01_20_142635_create_pemeriksaan_risikos_table.php
-│   │   ├── 2025_06_14_155953_add_wilayah_to_titik_risikos_table.php
-│   │   └── 2025_06_14_160041_add_revisi_ke_to_pemeriksaan_risikos_table.php
-│   └── seeders/
-│       └── DatabaseSeeder.php
-├── public/
-│   └── frontend/
-│       ├── config.php
-│       ├── index.php
-│       ├── daftar-risiko.php
-│       ├── detail.php
-│       ├── detail-pemeriksaan.php
-│       ├── edukasi.php
-│       └── tambah-pemeriksaan.php
-├── resources/views/
-│   ├── auth/login.blade.php
-│   ├── layouts/admin.blade.php
-│   ├── layouts/petugas.blade.php
-│   ├── admin/dashboard.blade.php
-│   ├── admin/rekap/index.blade.php
-│   ├── admin/titik-risiko/index.blade.php
-│   ├── admin/titik-risiko/create.blade.php
-│   ├── admin/titik-risiko/edit.blade.php
-│   ├── petugas/dashboard.blade.php
-│   ├── petugas/pemeriksaan-risiko/index.blade.php
-│   ├── petugas/pemeriksaan-risiko/create.blade.php
-│   └── petugas/pemeriksaan-risiko/edit.blade.php
-├── routes/
-│   ├── web.php
-│   └── api.php
-├── curl_test.php
-├── final_test.php
-└── setup_and_guide.md
+├── backend-moskout/              ← Laravel Backend
+│   ├── app/
+│   │   ├── Http/
+│   │   │   ├── Controllers/
+│   │   │   │   ├── AuthController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── PetugasDashboardController.php
+│   │   │   │   ├── TitikRisikoController.php
+│   │   │   │   ├── PemeriksaanRisikoController.php
+│   │   │   │   ├── RekapController.php
+│   │   │   │   └── ApiWaspadaController.php
+│   │   │   └── Middleware/
+│   │   │       └── RoleMiddleware.php
+│   │   └── Models/
+│   │       ├── User.php
+│   │       ├── TitikRisiko.php
+│   │       └── PemeriksaanRisiko.php
+│   ├── bootstrap/
+│   ├── config/
+│   ├── database/
+│   │   ├── migrations/
+│   │   └── seeders/
+│   ├── public/
+│   ├── resources/views/
+│   │   ├── auth/
+│   │   ├── layouts/
+│   │   ├── admin/
+│   │   └── petugas/
+│   ├── routes/
+│   │   ├── web.php
+│   │   └── api.php
+│   ├── composer.json
+│   ├── package.json
+│   ├── curl_test.php
+│   └── final_test.php
+├── frontend-moskout/             ← Public Portal (PHP Native)
+│   ├── api_proxy.php             ← Proxy API ke backend
+│   ├── config.php                ← Konfigurasi & helper cURL
+│   ├── index.php                 ← Beranda (daftar titik risiko)
+│   ├── daftar-risiko.php         ← Tabel daftar risiko (petugas)
+│   ├── detail.php                ← Detail & riwayat pemeriksaan
+│   ├── detail-pemeriksaan.php    ← Riwayat pemeriksaan per titik
+│   ├── edukasi.php               ← Halaman edukasi 3M Plus
+│   └── tambah-pemeriksaan.php    ← Form input pemeriksaan
+├── .gitignore
+├── README.md
+├── backend-moskout.zip
+└── frontend-moskout.zip
 ```
