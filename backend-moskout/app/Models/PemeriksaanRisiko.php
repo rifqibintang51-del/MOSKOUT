@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class PemeriksaanRisiko extends Model
 {
@@ -13,8 +14,15 @@ class PemeriksaanRisiko extends Model
     protected $fillable = [
         'titik_risiko_id', 'petugas_id', 'tanggal_pemeriksaan',
         'ditemukan_jentik', 'kondisi_lingkungan', 'tindakan_dilakukan',
-        'status_akhir', 'revisi_ke',
+        'status_akhir', 'revisi_ke', 'foto',
     ];
+
+    protected $appends = ['foto_url'];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? Storage::url($this->foto) : null;
+    }
 
     protected function casts(): array
     {

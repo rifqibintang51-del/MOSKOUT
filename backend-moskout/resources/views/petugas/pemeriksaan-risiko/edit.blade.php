@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-12 col-lg-8">
         <div class="glass-card p-4">
-            <form action="{{ route('petugas.pemeriksaan-risiko.update', $pemeriksaan->id) }}" method="POST">
+            <form action="{{ route('petugas.pemeriksaan-risiko.update', $pemeriksaan->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 
@@ -98,6 +98,26 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label for="foto" class="form-label">Foto Bukti Pemeriksaan</label>
+                    @if($pemeriksaan->foto_url)
+                        <div class="mb-2" id="existing-foto-wrapper">
+                            <img src="{{ $pemeriksaan->foto_url }}" class="img-thumbnail" style="max-height:150px;border-radius:12px;">
+                            <div class="form-check mt-1">
+                                <input type="checkbox" name="hapus_foto" id="hapus_foto" class="form-check-input" value="1">
+                                <label for="hapus_foto" class="form-check-label text-danger small">Hapus foto ini</label>
+                            </div>
+                        </div>
+                    @endif
+                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/*">
+                    @error('foto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="mt-2" id="preview-container" style="display:none;">
+                        <img id="preview" class="img-thumbnail" style="max-height:200px;border-radius:12px;">
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
                     <i class="bi bi-save me-1"></i> Simpan Perubahan
                 </button>
@@ -105,4 +125,22 @@
         </div>
     </div>
 </div>
+@section('scripts')
+<script>
+    document.getElementById('foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const container = document.getElementById('preview-container');
+                const preview = document.getElementById('preview');
+                preview.src = ev.target.result;
+                container.style.display = 'block';
+                const existing = document.getElementById('existing-foto-wrapper');
+                if (existing) existing.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection

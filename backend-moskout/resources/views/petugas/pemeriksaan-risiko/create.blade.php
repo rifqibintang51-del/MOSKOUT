@@ -12,7 +12,7 @@
 <div class="row">
     <div class="col-12 col-lg-8">
         <div class="glass-card p-4">
-            <form action="{{ route('petugas.pemeriksaan-risiko.store') }}" method="POST">
+            <form action="{{ route('petugas.pemeriksaan-risiko.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 
                 <div class="mb-3">
@@ -89,6 +89,17 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label for="foto" class="form-label">Foto Bukti Pemeriksaan</label>
+                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/*">
+                    @error('foto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="mt-2" id="preview-container" style="display:none;">
+                        <img id="preview" class="img-thumbnail" style="max-height:200px;border-radius:12px;">
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
                     <i class="bi bi-save me-1"></i> Simpan Hasil Pemeriksaan
                 </button>
@@ -96,4 +107,20 @@
         </div>
     </div>
 </div>
+@section('scripts')
+<script>
+    document.getElementById('foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const container = document.getElementById('preview-container');
+                const preview = document.getElementById('preview');
+                preview.src = ev.target.result;
+                container.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TitikRisiko;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class TitikRisikoController extends Controller
 {
@@ -34,9 +35,16 @@ class TitikRisikoController extends Controller
             'jenis_risiko' => 'required|in:genangan,barang bekas,saluran air,tempat sampah',
             'level_risiko_awal' => 'required|in:rendah,sedang,tinggi',
             'status_aktif' => 'required|boolean',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        TitikRisiko::create($request->all());
+        $data = $request->except('foto');
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('foto-titik-risiko', 'public');
+        }
+
+        TitikRisiko::create($data);
 
         return redirect()->route('admin.titik-risiko.index')
             ->with('success', 'Titik Risiko berhasil ditambahkan.');
@@ -65,9 +73,25 @@ class TitikRisikoController extends Controller
             'jenis_risiko' => 'required|in:genangan,barang bekas,saluran air,tempat sampah',
             'level_risiko_awal' => 'required|in:rendah,sedang,tinggi',
             'status_aktif' => 'required|boolean',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
         ]);
 
-        $titikRisiko->update($request->all());
+        $data = $request->except('foto', 'hapus_foto');
+
+        if ($request->boolean('hapus_foto') && $titikRisiko->foto) {
+            Storage::disk('public')->delete($titikRisiko->foto);
+            $data['foto'] = null;
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($titikRisiko->foto) {
+                Storage::disk('public')->delete($titikRisiko->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('foto-titik-risiko', 'public');
+        }
+
+        $titikRisiko->update($data);
 
         return redirect()->route('admin.titik-risiko.index')
             ->with('success', 'Titik Risiko berhasil diperbarui.');
@@ -76,6 +100,9 @@ class TitikRisikoController extends Controller
     public function destroy($id)
     {
         $titikRisiko = TitikRisiko::findOrFail($id);
+        if ($titikRisiko->foto) {
+            Storage::disk('public')->delete($titikRisiko->foto);
+        }
         $titikRisiko->delete();
 
         return redirect()->route('admin.titik-risiko.index')

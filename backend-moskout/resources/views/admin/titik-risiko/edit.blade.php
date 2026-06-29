@@ -30,7 +30,7 @@
 <div class="row">
     <div class="col-12 col-lg-7">
         <div class="glass-card p-4">
-            <form action="{{ route('admin.titik-risiko.update', $titikRisiko->id) }}" method="POST">
+            <form action="{{ route('admin.titik-risiko.update', $titikRisiko->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 
@@ -151,6 +151,26 @@
                         @error('status_aktif')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="foto" class="form-label">Foto Titik Risiko</label>
+                    @if($titikRisiko->foto_url)
+                        <div class="mb-2" id="existing-foto-wrapper">
+                            <img src="{{ $titikRisiko->foto_url }}" class="img-thumbnail" style="max-height:150px;border-radius:12px;">
+                            <div class="form-check mt-1">
+                                <input type="checkbox" name="hapus_foto" id="hapus_foto" class="form-check-input" value="1">
+                                <label for="hapus_foto" class="form-check-label text-danger small">Hapus foto ini</label>
+                            </div>
+                        </div>
+                    @endif
+                    <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/*">
+                    @error('foto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="mt-2" id="preview-container" style="display:none;">
+                        <img id="preview" class="img-thumbnail" style="max-height:200px;border-radius:12px;">
                     </div>
                 </div>
 
@@ -377,5 +397,22 @@
     });
 
     loadWilayah();
+
+    // Preview foto
+    document.getElementById('foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const container = document.getElementById('preview-container');
+                const preview = document.getElementById('preview');
+                preview.src = ev.target.result;
+                container.style.display = 'block';
+                const existing = document.getElementById('existing-foto-wrapper');
+                if (existing) existing.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
 </script>
 @endsection

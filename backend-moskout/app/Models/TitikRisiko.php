@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 
 class TitikRisiko extends Model
 {
@@ -13,8 +14,15 @@ class TitikRisiko extends Model
     protected $fillable = [
         'nama_titik', 'alamat', 'rt_rw', 'provinsi', 'kabupaten', 'kecamatan', 'kelurahan',
         'latitude', 'longitude',
-        'jenis_risiko', 'level_risiko_awal', 'status_aktif',
+        'jenis_risiko', 'level_risiko_awal', 'status_aktif', 'foto',
     ];
+
+    protected $appends = ['foto_url'];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? Storage::url($this->foto) : null;
+    }
 
     protected function casts(): array
     {

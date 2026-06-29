@@ -27,6 +27,7 @@
             <thead>
                 <tr>
                     <th style="width: 50px;" class="text-center">No</th>
+                    <th style="width: 80px;">Foto</th>
                     <th>Nama Titik / Lokasi</th>
                     <th>Detail Alamat</th>
                     <th>Jenis Risiko</th>
@@ -39,6 +40,13 @@
                 @forelse($titikRisikos as $index => $titik)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">
+                            @if($titik->foto_url)
+                                <img src="{{ $titik->foto_url }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;" alt="Foto">
+                            @else
+                                <span class="text-muted small">-</span>
+                            @endif
+                        </td>
                         <td>
                             <div class="fw-bold">{{ $titik->nama_titik }}</div>
                             <small class="text-muted">RT/RW: {{ $titik->rt_rw ?? '-' }}</small>
@@ -91,7 +99,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Belum ada data titik risiko.</td>
+                        <td colspan="8" class="text-center text-muted py-4">Belum ada data titik risiko.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -243,6 +243,7 @@ if ($id <= 0) {
                 '<td><span class="small d-block text-wrap">' + esc(pem.kondisi_lingkungan) + '</span></td>' +
                 '<td><span class="small d-block text-wrap">' + esc(pem.tindakan_dilakukan) + '</span></td>' +
                 '<td class="text-center"><span class="badge rounded-pill px-3 py-2 text-uppercase ' + sClass + '" style="font-size:0.75rem;">' + esc(pem.status_akhir) + '</span></td>' +
+                '<td class="text-center">' + (pem.foto_url ? '<img src="' + esc(pem.foto_url) + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;" onclick="window.open(\'' + esc(pem.foto_url) + '\')">' : '<span class="text-muted">-</span>') + '</td>' +
                 '</tr>';
         });
         container.innerHTML =
@@ -252,6 +253,7 @@ if ($id <= 0) {
             '<th style="width:150px;">Tanggal</th><th style="width:100px;" class="text-center">Jentik</th>' +
             '<th>Kondisi Lingkungan</th><th>Tindakan Dilakukan</th>' +
             '<th style="width:180px;" class="text-center">Status Akhir</th>' +
+            '<th style="width:80px;" class="text-center">Foto</th>' +
             '</tr></thead><tbody>' + rows + '</tbody></table></div>';
     }
 

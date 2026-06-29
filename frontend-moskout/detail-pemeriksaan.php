@@ -144,6 +144,7 @@ async function loadDetail(titikId) {
                                 <p class="text-muted small">${esc(p.kondisi_lingkungan).replace(/\n/g, '<br>')}</p>
                                 <p class="mb-1"><strong>Tindakan:</strong></p>
                                 <p class="text-muted small">${esc(p.tindakan_dilakukan).replace(/\n/g, '<br>')}</p>
+                                ${p.foto_url ? '<div class="mt-2"><img src="' + esc(p.foto_url) + '" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;cursor:pointer;" onclick="window.open(\'' + esc(p.foto_url) + '\')"></div>' : ''}
                             </div>
                         </div>
                     </div>

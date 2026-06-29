@@ -27,6 +27,7 @@
             <thead>
                 <tr>
                     <th style="width: 50px;" class="text-center">No</th>
+                    <th style="width: 80px;">Foto</th>
                     <th>Titik Risiko</th>
                     <th>Info Petugas & Tanggal</th>
                     <th class="text-center">Revisi</th>
@@ -40,6 +41,13 @@
                 @forelse($pemeriksaans as $index => $pem)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center">
+                            @if($pem->foto_url)
+                                <img src="{{ $pem->foto_url }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;" alt="Foto">
+                            @else
+                                <span class="text-muted small">-</span>
+                            @endif
+                        </td>
                         <td>
                             @if($pem->titikRisiko)
                                 <div class="fw-bold">{{ $pem->titikRisiko->nama_titik }}</div>
@@ -101,7 +109,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">Belum ada riwayat laporan pemeriksaan.</td>
+                        <td colspan="9" class="text-center text-muted py-4">Belum ada riwayat laporan pemeriksaan.</td>
                     </tr>
                 @endforelse
             </tbody>

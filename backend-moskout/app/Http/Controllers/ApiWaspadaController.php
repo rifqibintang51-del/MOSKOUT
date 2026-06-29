@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TitikRisiko;
 use App\Models\PemeriksaanRisiko;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ApiWaspadaController extends Controller
@@ -60,7 +61,7 @@ class ApiWaspadaController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'titik_risiko_id'       => 'required|exists:titik_risikos,id',
             'petugas_id'            => 'required|integer|exists:users,id',
             'tanggal_pemeriksaan'   => 'required|date|before_or_equal:today',
@@ -68,7 +69,10 @@ class ApiWaspadaController extends Controller
             'kondisi_lingkungan'    => 'required|string|min:10',
             'tindakan_dilakukan'    => 'required|string|min:5',
             'status_akhir'          => 'required|in:aman,perlu pemantauan,perlu tindakan',
-        ]);
+            'foto'                  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
@@ -79,6 +83,11 @@ class ApiWaspadaController extends Controller
         }
 
         $data = $validator->validated();
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('foto-pemeriksaan', 'public');
+        }
+
         $data['revisi_ke'] = 1;
         $pemeriksaan = PemeriksaanRisiko::create($data);
 
